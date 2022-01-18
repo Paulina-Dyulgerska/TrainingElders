@@ -8,7 +8,7 @@ var input = Console.ReadLine();
 
 var stringBuilder = new StringBuilder();
 
-if (!string.IsNullOrWhiteSpace(input))
+if (string.IsNullOrWhiteSpace(input) == false)
 {
     for (int i = input.Length - 1; i >= 0; i--)
     {
