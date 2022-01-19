@@ -1,0 +1,10 @@
+﻿namespace Session2.IO
+{
+    public class ConsoleReader : IReader
+    {
+        public string ReadLine()
+        {
+            return Console.ReadLine() ?? "no data";
+        }
+    }
+}
