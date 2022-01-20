@@ -29,7 +29,7 @@ namespace Session2
 
             var worldDimentions = new WorldDimentions { Width = 4, Height = 5 };
             var world = God.BigBang(worldDimentions).TheSixthDay(12);
-            var worldDrawing = Drawer.Draw(world);
+            var worldDrawing = ConsoleDrawer.Draw(world);
             writer.WriteLine("After The Big Bang");
             writer.WriteLine(worldDrawing);
 
@@ -38,7 +38,7 @@ namespace Session2
                 //Thread.Sleep(1000);
                 //writer.Clear();
                 world.Run();
-                worldDrawing = Drawer.Draw(world);
+                worldDrawing = ConsoleDrawer.Draw(world);
                 writer.WriteLine(worldDrawing);
             }
         }

@@ -31,5 +31,11 @@ namespace Discworld
 
             animals.Remove(animal);
         }
+
+        public void Decompose()
+        {
+            animals.RemoveAll(a => a.IsDead);
+        }
+
     }
 }

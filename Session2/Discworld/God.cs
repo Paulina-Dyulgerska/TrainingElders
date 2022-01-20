@@ -31,19 +31,14 @@ namespace Discworld
                 if (total >= count)
                     break;
 
-                var isMale = false;
-
-                if (Random.Shared.Next(0, 2) == 0)
-                        isMale = true;
-
                 switch (Random.Shared.Next(0, 3))
                 {
                     case 1:
-                        cell.Visit(new Herbivore(cell, new Gender { IsMale = isMale}));
+                        cell.Visit(new Herbivore(cell, Gender.Random()));
                         total++;
                         break;
                     case 2:
-                        cell.Visit(new Carnivore(cell, new Gender { IsMale = isMale }));
+                        cell.Visit(new Carnivore(cell, Gender.Random()));
                         total++;
                         break;
                     default:

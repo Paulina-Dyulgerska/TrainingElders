@@ -2,10 +2,9 @@
 {
     public class Carnivore : Animal
     {
-        public Carnivore(Cell cell, Gender gender) : base(cell, gender) 
-        {
-            IAmFood = true;
-        }
+        public Carnivore(Cell cell, Gender gender) : base(cell, gender) { }
+
+        public Carnivore(Animal parent, Gender gender) : base(parent, gender) { }
 
         protected override void Eat(Animal animal)
         {
@@ -14,6 +13,16 @@
             {
                 animal.Die();
             }
+        }
+
+        public override void Die()
+        {
+            IsDead = false;
+        }
+
+        protected override Animal GiveBirth(Gender gender)
+        {
+            return new Carnivore(this, gender);
         }
     }
 }

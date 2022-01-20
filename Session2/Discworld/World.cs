@@ -13,9 +13,9 @@ namespace Discworld
 
         public IEnumerable<Cell> Cells => cells;
 
-        public IEnumerable<Animal> Animals => cells.SelectMany(c => c.Animals).ToList();
+        public IEnumerable<Animal> Animals => cells.SelectMany(c => c.Animals).ToList(); // TODO remove the ToList
 
-        // World will not run if there neither carnivores nor herbivores
+        // World will not run if there are neither carnivores nor herbivores
         public bool CanRun => Animals.Any(x => x.GetType() == typeof(Herbivore)) && Animals.Any(x => x.GetType() == typeof(Carnivore));
 
         public void Run()
@@ -34,30 +34,25 @@ namespace Discworld
             }
 
             // Feed animals:
-            foreach (var animal in Animals.Where(x=>x.IAmFood)) // Carnivores eat eachother if not check for IAmFood
+            foreach (var animal in Animals)
             {
                 animal.Feed();
             }
 
             // Bury the dead animals:
-            //var deadAnimals = cells.Where(x => x.Animals.Any(x => x.IsDead)).SelectMany(x=>x.Animals.Where(x=>x.IsDead));
-            var cellsWithDeadAnimal = cells.Where(x => x.Animals.Any(x => x.IsDead));
-            foreach (var cell in cellsWithDeadAnimal)
+            foreach (var cell in cells)
             {
-                var deadAnimal = cell.Animals.Where(x => x.IsDead).FirstOrDefault();
-                if (deadAnimal != null)
-                    cell.Leave(deadAnimal);
+                cell.Decompose();
             }
 
             // Deliver babies:
             foreach (var animal in Animals)
             {
-                animal.FindPartner(); // TODO
+                var babyAnimal = animal.Mate();
+
+                if (babyAnimal != null)
+                    animal.CurrentCell.Visit(babyAnimal);
             }
         }
-
-        //public string GetDrawing()
-        //{
-        //}
     }
 }

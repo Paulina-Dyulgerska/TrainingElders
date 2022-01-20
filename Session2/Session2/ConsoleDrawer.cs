@@ -4,8 +4,14 @@ using System.Text;
 
 namespace Session2
 {
-    public static class Drawer
+    public static class ConsoleDrawer
     {
+        private static readonly Dictionary<Type, char> alphabet = new Dictionary<Type, char>
+        {
+            { typeof(Herbivore), 'H' },
+            { typeof(Carnivore), 'C' }
+        };
+
         public static string Draw(World world)
         {
             var herbivoresCount = world.Cells.SelectMany(x => x.Animals).Count(x => x.GetType() == typeof(Herbivore));
@@ -21,7 +27,7 @@ namespace Session2
                 {
                     foreach (var animal in cell.Animals)
                     {
-                        stringBuilder.Append($"{animal.GetDrawing()}");
+                        stringBuilder.Append($"{alphabet[animal.GetType()]}");
 
                         if (cell.Animals.Count() > 1)
                         {
