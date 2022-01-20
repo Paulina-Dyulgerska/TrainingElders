@@ -13,14 +13,14 @@ namespace Discworld
 
         public IEnumerable<Cell> Cells => cells;
 
-        public IEnumerable<Animal> Animals => cells.SelectMany(c => c.Animals).ToList(); // TODO remove the ToList
+        public IEnumerable<Animal> Animals => cells.SelectMany(c => c.Animals);
 
         // World will not run if there are neither carnivores nor herbivores
         public bool CanRun => Animals.Any(x => x.GetType() == typeof(Herbivore)) && Animals.Any(x => x.GetType() == typeof(Carnivore));
 
         public void Run()
         {
-            // Move animals onto new cells:
+            var movements = new List<(Animal animal, Cell cell)>();
             foreach (var animal in Animals)
             {
                 Cell? nextCell = null;
@@ -30,12 +30,12 @@ namespace Discworld
                     nextCell = cells.FirstOrDefault(x => x.Position == next);
                 } while (nextCell is null);
 
-                animal.Walk(nextCell);
+                movements.Add((animal, nextCell));
             }
 
-            foreach (var cell in cells)
+            foreach (var movement in movements)
             {
-                //cell.LeaveAnimals();
+                movement.animal.Walk(movement.cell);
             }
 
             // Feed animals:
@@ -51,9 +51,19 @@ namespace Discworld
             }
 
             // Deliver babies:
+            var babies = new List<Animal>();
             foreach (var animal in Animals)
             {
-                animal.Mate();
+                var baby = animal.Mate();
+                if (baby == null)
+                    continue;
+
+                babies.Add(baby);
+            }
+
+            foreach (var baby in babies)
+            {
+                baby.CurrentCell.Visit(baby);
             }
         }
     }

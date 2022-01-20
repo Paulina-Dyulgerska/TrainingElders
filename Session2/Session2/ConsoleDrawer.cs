@@ -16,7 +16,7 @@ namespace Session2
         {
             var herbivoresCount = world.Cells.SelectMany(x => x.Animals).Count(x => x.GetType() == typeof(Herbivore));
             var carnivoresCount = world.Cells.SelectMany(x => x.Animals).Count(x => x.GetType() == typeof(Carnivore));
-            var worldWidth = world.Cells.Select(x=>x.Position.Y).Max();
+            var worldWidth = world.Cells.Select(x => x.Position.Y).Max();
 
             var stringBuilder = new StringBuilder();
             var countWidth = 0;
@@ -25,23 +25,13 @@ namespace Session2
             {
                 if (cell.Animals.Any())
                 {
-                    foreach (var animal in cell.Animals)
-                    {
-                        stringBuilder.Append($"{alphabet[animal.GetType()]}");
-
-                        if (cell.Animals.Count() > 1)
-                        {
-                            stringBuilder.Append('|');
-                        }
-                        else
-                        {
-                            stringBuilder.Append(' ');
-                        }
-                    }
+                    var herbivoresInCell = cell.Animals.Count(x => x.GetType() == typeof(Herbivore));
+                    var carnivoresInCell = cell.Animals.Count(x => x.GetType() == typeof(Carnivore));
+                    stringBuilder.Append($"|Cx{carnivoresInCell} Hx{herbivoresInCell} ");
                 }
                 else
                 {
-                    stringBuilder.Append($"- ");
+                    stringBuilder.Append($"|- ");
                 }
 
                 countWidth++;

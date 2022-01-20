@@ -15,16 +15,11 @@
             }
         }
 
-        public override void Die()
-        {
-            IsDead = false;
-        }
+        public override void Die() { }
 
         protected override Animal GiveBirth(Gender gender)
         {
             var baby = new Carnivore(this, gender);
-            baby.Walk(CurrentCell);
-
             return baby;
         }
     }

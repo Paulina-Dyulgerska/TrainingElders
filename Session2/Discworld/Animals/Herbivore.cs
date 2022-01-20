@@ -11,8 +11,6 @@
         protected override Animal GiveBirth(Gender gender)
         {
             var baby = new Herbivore(this, gender);
-            baby.Walk(CurrentCell);
-
             return baby;
         }
     }

@@ -9,7 +9,6 @@
             if (cell is null) throw new ArgumentNullException(nameof(cell));
             if (gender is null) throw new ArgumentNullException(nameof(gender));
 
-            //cell.Visit(this);
             CurrentCell = cell;
             Gender = gender;
         }
@@ -48,7 +47,6 @@
         {
             foreach (var animal in CurrentCell.Animals)
             {
-                // Do not eat yourself
                 if (animal == this)
                     continue;
 
@@ -58,9 +56,6 @@
 
         public Animal? Mate()
         {
-            //if (ReferenceEquals(otherParent, this))
-            //    return;
-
             if (Gender.IsMale)
                 return null;
 
@@ -69,14 +64,10 @@
                 return null;
 
             return GiveBirth(Gender.Random());
-
-            //if (GetType() != otherParent.GetType())
-            //    return;
         }
 
         public virtual void Die()
         {
-            //CurrentCell.Leave(this);
             IsDead = true;
         }
 
