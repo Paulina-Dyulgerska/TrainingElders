@@ -33,6 +33,11 @@ namespace Discworld
                 animal.Walk(nextCell);
             }
 
+            foreach (var cell in cells)
+            {
+                //cell.LeaveAnimals();
+            }
+
             // Feed animals:
             foreach (var animal in Animals)
             {
@@ -48,10 +53,7 @@ namespace Discworld
             // Deliver babies:
             foreach (var animal in Animals)
             {
-                var babyAnimal = animal.Mate();
-
-                if (babyAnimal != null)
-                    animal.CurrentCell.Visit(babyAnimal);
+                animal.Mate();
             }
         }
     }

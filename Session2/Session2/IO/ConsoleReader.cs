@@ -2,9 +2,9 @@
 {
     public class ConsoleReader : IReader
     {
-        public string ReadLine()
+        public string? ReadLine()
         {
-            return Console.ReadLine() ?? "no data";
+            return Console.ReadLine();
         }
     }
 }

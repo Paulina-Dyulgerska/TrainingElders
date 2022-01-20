@@ -10,7 +10,10 @@
 
         protected override Animal GiveBirth(Gender gender)
         {
-            return new Herbivore(this, gender);
+            var baby = new Herbivore(this, gender);
+            baby.Walk(CurrentCell);
+
+            return baby;
         }
     }
 }

@@ -36,6 +36,5 @@ namespace Discworld
         {
             animals.RemoveAll(a => a.IsDead);
         }
-
     }
 }

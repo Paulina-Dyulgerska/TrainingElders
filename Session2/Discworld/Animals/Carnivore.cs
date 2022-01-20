@@ -22,7 +22,10 @@
 
         protected override Animal GiveBirth(Gender gender)
         {
-            return new Carnivore(this, gender);
+            var baby = new Carnivore(this, gender);
+            baby.Walk(CurrentCell);
+
+            return baby;
         }
     }
 }
