@@ -14,12 +14,6 @@ namespace WcfServiceLibrary
         void Receive(ChatMessage msg);
 
         [OperationContract(IsOneWay = true)]
-        void ReceiveWhisper(ChatMessage msg, User receiver);
-
-        [OperationContract(IsOneWay = true)]
-        void IsWritingCallback(User user);
-
-        [OperationContract(IsOneWay = true)]
         void UserJoin(User user);
 
         [OperationContract(IsOneWay = true)]

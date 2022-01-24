@@ -45,12 +45,6 @@
   <wsdl:message name="IChat_Say_InputMessage">
     <wsdl:part name="parameters" element="tns:Say" />
   </wsdl:message>
-  <wsdl:message name="IChat_Whisper_InputMessage">
-    <wsdl:part name="parameters" element="tns:Whisper" />
-  </wsdl:message>
-  <wsdl:message name="IChat_IsWriting_InputMessage">
-    <wsdl:part name="parameters" element="tns:IsWriting" />
-  </wsdl:message>
   <wsdl:message name="IChat_Disconnect_InputMessage">
     <wsdl:part name="parameters" element="tns:Disconnect" />
   </wsdl:message>
@@ -59,12 +53,6 @@
   </wsdl:message>
   <wsdl:message name="IChat_Receive_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:Receive" />
-  </wsdl:message>
-  <wsdl:message name="IChat_ReceiveWhisper_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:ReceiveWhisper" />
-  </wsdl:message>
-  <wsdl:message name="IChat_IsWritingCallback_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:IsWritingCallback" />
   </wsdl:message>
   <wsdl:message name="IChat_UserJoin_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:UserJoin" />
@@ -80,12 +68,6 @@
     <wsdl:operation name="Say">
       <wsdl:input wsaw:Action="http://tempuri.org/IChat/Say" message="tns:IChat_Say_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="Whisper">
-      <wsdl:input wsaw:Action="http://tempuri.org/IChat/Whisper" message="tns:IChat_Whisper_InputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="IsWriting">
-      <wsdl:input wsaw:Action="http://tempuri.org/IChat/IsWriting" message="tns:IChat_IsWriting_InputMessage" />
-    </wsdl:operation>
     <wsdl:operation name="Disconnect">
       <wsdl:input wsaw:Action="http://tempuri.org/IChat/Disconnect" message="tns:IChat_Disconnect_InputMessage" />
     </wsdl:operation>
@@ -94,12 +76,6 @@
     </wsdl:operation>
     <wsdl:operation name="Receive">
       <wsdl:output wsaw:Action="http://tempuri.org/IChat/Receive" message="tns:IChat_Receive_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="ReceiveWhisper">
-      <wsdl:output wsaw:Action="http://tempuri.org/IChat/ReceiveWhisper" message="tns:IChat_ReceiveWhisper_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="IsWritingCallback">
-      <wsdl:output wsaw:Action="http://tempuri.org/IChat/IsWritingCallback" message="tns:IChat_IsWritingCallback_OutputCallbackMessage" />
     </wsdl:operation>
     <wsdl:operation name="UserJoin">
       <wsdl:output wsaw:Action="http://tempuri.org/IChat/UserJoin" message="tns:IChat_UserJoin_OutputCallbackMessage" />
@@ -126,18 +102,6 @@
         <soap12:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
-    <wsdl:operation name="Whisper">
-      <soap12:operation soapAction="http://tempuri.org/IChat/Whisper" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="IsWriting">
-      <soap12:operation soapAction="http://tempuri.org/IChat/IsWriting" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-    </wsdl:operation>
     <wsdl:operation name="Disconnect">
       <soap12:operation soapAction="http://tempuri.org/IChat/Disconnect" style="document" />
       <wsdl:input>
@@ -152,18 +116,6 @@
     </wsdl:operation>
     <wsdl:operation name="Receive">
       <soap12:operation soapAction="http://tempuri.org/IChat/Receive" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="ReceiveWhisper">
-      <soap12:operation soapAction="http://tempuri.org/IChat/ReceiveWhisper" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="IsWritingCallback">
-      <soap12:operation soapAction="http://tempuri.org/IChat/IsWritingCallback" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

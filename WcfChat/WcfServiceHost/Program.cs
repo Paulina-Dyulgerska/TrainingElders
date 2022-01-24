@@ -19,7 +19,7 @@ namespace WcfServiceHost
             try
             {
                 // Step 3: Add a service endpoint.
-                selfHost.AddServiceEndpoint(typeof(IChat), new NetTcpBinding(), "tcp");
+                selfHost.AddServiceEndpoint(typeof(IChat), new NetTcpBinding(SecurityMode.None), "tcp");
 
                 // Step 4: Enable metadata exchange.
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
@@ -38,7 +38,7 @@ namespace WcfServiceHost
             }
             catch (CommunicationException ce)
             {
-                Console.WriteLine("An exception occurred: {0}", ce.Message);
+                Console.WriteLine($"An exception occurred: {ce.Message}");
                 selfHost.Abort();
             }
         }

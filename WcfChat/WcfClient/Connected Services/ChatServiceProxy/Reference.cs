@@ -167,18 +167,6 @@ namespace WcfClient.ChatServiceProxy {
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/Say")]
         System.Threading.Tasks.Task SayAsync(WcfClient.ChatServiceProxy.ChatMessage msg);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/Whisper")]
-        void Whisper(WcfClient.ChatServiceProxy.ChatMessage msg, WcfClient.ChatServiceProxy.User receiver);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/Whisper")]
-        System.Threading.Tasks.Task WhisperAsync(WcfClient.ChatServiceProxy.ChatMessage msg, WcfClient.ChatServiceProxy.User receiver);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/IsWriting")]
-        void IsWriting(WcfClient.ChatServiceProxy.User user);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/IsWriting")]
-        System.Threading.Tasks.Task IsWritingAsync(WcfClient.ChatServiceProxy.User user);
-        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/Disconnect")]
         void Disconnect(WcfClient.ChatServiceProxy.User user);
         
@@ -194,12 +182,6 @@ namespace WcfClient.ChatServiceProxy {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/Receive")]
         void Receive(WcfClient.ChatServiceProxy.ChatMessage msg);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/ReceiveWhisper")]
-        void ReceiveWhisper(WcfClient.ChatServiceProxy.ChatMessage msg, WcfClient.ChatServiceProxy.User receiver);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/IsWritingCallback")]
-        void IsWritingCallback(WcfClient.ChatServiceProxy.User user);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IChat/UserJoin")]
         void UserJoin(WcfClient.ChatServiceProxy.User user);
@@ -250,22 +232,6 @@ namespace WcfClient.ChatServiceProxy {
         
         public System.Threading.Tasks.Task SayAsync(WcfClient.ChatServiceProxy.ChatMessage msg) {
             return base.Channel.SayAsync(msg);
-        }
-        
-        public void Whisper(WcfClient.ChatServiceProxy.ChatMessage msg, WcfClient.ChatServiceProxy.User receiver) {
-            base.Channel.Whisper(msg, receiver);
-        }
-        
-        public System.Threading.Tasks.Task WhisperAsync(WcfClient.ChatServiceProxy.ChatMessage msg, WcfClient.ChatServiceProxy.User receiver) {
-            return base.Channel.WhisperAsync(msg, receiver);
-        }
-        
-        public void IsWriting(WcfClient.ChatServiceProxy.User user) {
-            base.Channel.IsWriting(user);
-        }
-        
-        public System.Threading.Tasks.Task IsWritingAsync(WcfClient.ChatServiceProxy.User user) {
-            return base.Channel.IsWritingAsync(user);
         }
         
         public void Disconnect(WcfClient.ChatServiceProxy.User user) {

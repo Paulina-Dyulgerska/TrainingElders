@@ -17,9 +17,13 @@ namespace WcfClient
                 return;
             }
 
+            ChatClient chatClient = null;
             try
             {
-                var chatClient = new ChatClient(new InstanceContext(new ChatClientCallBack()), "NetTcpBinding_IChat", new EndpointAddress($"net.tcp://{ip}:50820/Chat/tcp"));
+                //var chatClient = new ChatClient(new InstanceContext(new ChatClientCallBack()), "NetTcpBinding_IChat", new EndpointAddress($"net.tcp://{ip}:50820/Chat/tcp"));
+                // this is using the available tcp binding at the host: this one -> selfHost.AddServiceEndpoint(typeof(IChat), new NetTcpBinding(SecurityMode.None), "tcp");
+                chatClient = new ChatClient(new InstanceContext(new ChatClientCallBack()), new NetTcpBinding(SecurityMode.None), new EndpointAddress($"net.tcp://{ip}:50820/Chat/tcp"));
+                chatClient.Open();
 
                 Console.WriteLine("Enter your username: ");
                 var username = Console.ReadLine();
@@ -44,10 +48,16 @@ namespace WcfClient
                     message = Console.ReadLine();
                     chatClient.Say(new ChatMessage() { Content = message, Sender = user.Name, Time = DateTime.Now });
                 } while (message != "exit");
+
+                chatClient.Disconnect(user);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An exception occurred: {ex.Message}");
+            }
+            finally
+            {
+                chatClient?.Close();
             }
         }
     }

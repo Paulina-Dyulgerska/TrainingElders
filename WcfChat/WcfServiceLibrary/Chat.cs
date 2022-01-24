@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using WcfServiceLibrary.Models;
 
@@ -13,12 +15,14 @@ namespace WcfServiceLibrary
         private readonly Dictionary<User, IChatClientCallback> Users = new Dictionary<User, IChatClientCallback>();
         private readonly List<User> UserList = new List<User>();
 
-        object syncObj = new object();
+        static readonly object mutex = new object();
 
         public IChatClientCallback CurrentCallback
         {
             get
             {
+                OperationContext.Current.Channel.Faulted += new EventHandler(OnChannelFaulted);
+                //OperationContext.Current.Channel.Closed += new EventHandler(OnChannelFaulted);
                 return OperationContext.Current.GetCallbackChannel<IChatClientCallback>();
 
             }
@@ -36,11 +40,28 @@ namespace WcfServiceLibrary
             return false;
         }
 
+        private void OnChannelFaulted(object sender, EventArgs e)
+        {
+            //Console.WriteLine((IChatClientCallback)sender);
+
+            var user = Users.Where(x => x.Value == (IChatClientCallback)sender).FirstOrDefault().Key;
+            if (user != null)
+            {
+                //Console.WriteLine(String.Join(", ", UserList.Select(x => x.Name)));
+                //Console.WriteLine(user.Name + " - I am with a broken connection");
+                //Users.Remove(user);
+                //UserList.Remove(user);
+
+                Disconnect(user);
+            }
+            //Console.WriteLine(String.Join(", ", UserList.Select(x => x.Name)));
+        }
+
         public bool Connect(User User)
         {
             if (!Users.ContainsValue(CurrentCallback) && !SearchUsersByName(User.Name))
             {
-                lock (syncObj)
+                lock (mutex)
                 {
                     Users.Add(User, CurrentCallback);
                     UserList.Add(User);
@@ -68,44 +89,11 @@ namespace WcfServiceLibrary
 
         public void Say(ChatMessage msg)
         {
-            lock (syncObj)
+            lock (mutex)
             {
                 foreach (IChatClientCallback callback in Users.Values)
                 {
                     callback.Receive(msg);
-                }
-            }
-        }
-
-        public void Whisper(ChatMessage msg, User receiver)
-        {
-            foreach (User rec in Users.Keys)
-            {
-                if (rec.Name == receiver.Name)
-                {
-                    IChatClientCallback callback = Users[rec];
-                    callback.ReceiveWhisper(msg, rec);
-
-                    foreach (User sender in Users.Keys)
-                    {
-                        if (sender.Name == msg.Sender)
-                        {
-                            IChatClientCallback senderCallback = Users[sender];
-                            senderCallback.ReceiveWhisper(msg, rec);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        public void IsWriting(User User)
-        {
-            lock (syncObj)
-            {
-                foreach (IChatClientCallback callback in Users.Values)
-                {
-                    callback.IsWritingCallback(User);
                 }
             }
         }
@@ -116,14 +104,14 @@ namespace WcfServiceLibrary
             {
                 if (User.Name == c.Name)
                 {
-                    lock (syncObj)
+                    lock (mutex)
                     {
-                        this.Users.Remove(c);
-                        this.UserList.Remove(c);
+                        Users.Remove(c);
+                        UserList.Remove(c);
                         foreach (IChatClientCallback callback in Users.Values)
                         {
-                            callback.RefreshUsers(this.UserList);
                             callback.UserLeave(User);
+                            callback.RefreshUsers(UserList);
                         }
                     }
                     return;

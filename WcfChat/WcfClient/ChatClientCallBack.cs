@@ -6,19 +6,9 @@ namespace WcfClient
 {
     internal class ChatClientCallBack : IChatCallback
     {
-        public void IsWritingCallback(User user)
-        {
-            Console.WriteLine(nameof(IsWritingCallback));
-        }
-
         public void Receive(ChatMessage msg)
         {
             Console.WriteLine($"{msg.Sender} ({msg.Time}): {msg.Content}");
-        }
-
-        public void ReceiveWhisper(ChatMessage msg, User receiver)
-        {
-            Console.WriteLine(nameof(ReceiveWhisper));
         }
 
         public void RefreshUsers(User[] users)
