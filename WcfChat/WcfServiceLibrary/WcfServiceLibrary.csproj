@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="IChat.cs" />
     <Compile Include="IChatClientCallback.cs" />
-    <Compile Include="Models\ChatMEssage.cs" />
+    <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Chat.cs" />

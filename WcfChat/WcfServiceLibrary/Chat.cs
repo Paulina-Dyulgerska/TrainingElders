@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -12,8 +13,8 @@ namespace WcfServiceLibrary
     //ConcurrencyMode.Single
     public class Chat : IChat
     {
-        private readonly Dictionary<User, IChatClientCallback> Users = new Dictionary<User, IChatClientCallback>();
-        private readonly List<User> UserList = new List<User>();
+        private readonly ConcurrentDictionary<User, IChatClientCallback> Users = new ConcurrentDictionary<User, IChatClientCallback>();
+        public IEnumerable<User> AllUsers => Users.Keys;
 
         static readonly object mutex = new object();
 
@@ -30,7 +31,7 @@ namespace WcfServiceLibrary
 
         private bool SearchUsersByName(string name)
         {
-            foreach (User c in Users.Keys)
+            foreach (User c in AllUsers)
             {
                 if (c.Name == name)
                 {
@@ -57,30 +58,29 @@ namespace WcfServiceLibrary
             //Console.WriteLine(String.Join(", ", UserList.Select(x => x.Name)));
         }
 
-        public bool Connect(User User)
+        public bool Connect(User user)
         {
-            if (!Users.ContainsValue(CurrentCallback) && !SearchUsersByName(User.Name))
+            if (SearchUsersByName(user.Name) == false)
             {
                 lock (mutex)
                 {
-                    Users.Add(User, CurrentCallback);
-                    UserList.Add(User);
+                    Users.TryAdd(user, CurrentCallback);
+                    //UserList.Add(user);
 
-                    foreach (User key in Users.Keys)
+                    foreach (User key in AllUsers)
                     {
                         IChatClientCallback callback = Users[key];
                         try
                         {
-                            callback.RefreshUsers(UserList);
-                            callback.UserJoin(User);
+                            callback.RefreshUsers(AllUsers);
+                            callback.UserJoin(user);
                         }
                         catch
                         {
-                            Users.Remove(key);
+                            Users.TryRemove(key, out var _);
                             return false;
                         }
                     }
-
                 }
                 return true;
             }
@@ -98,20 +98,19 @@ namespace WcfServiceLibrary
             }
         }
 
-        public void Disconnect(User User)
+        public void Disconnect(User user)
         {
-            foreach (User c in Users.Keys)
+            foreach (User c in AllUsers)
             {
-                if (User.Name == c.Name)
+                if (user.Name == c.Name)
                 {
                     lock (mutex)
                     {
-                        Users.Remove(c);
-                        UserList.Remove(c);
+                        Users.TryRemove(c, out var _);
                         foreach (IChatClientCallback callback in Users.Values)
                         {
-                            callback.UserLeave(User);
-                            callback.RefreshUsers(UserList);
+                            callback.UserLeave(user);
+                            callback.RefreshUsers(AllUsers);
                         }
                     }
                     return;

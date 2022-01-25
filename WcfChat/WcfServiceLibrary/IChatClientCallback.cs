@@ -8,7 +8,7 @@ namespace WcfServiceLibrary
     public interface IChatClientCallback
     {
         [OperationContract(IsOneWay = true)]
-        void RefreshUsers(List<User> users);
+        void RefreshUsers(IEnumerable<User> users);
 
         [OperationContract(IsOneWay = true)]
         void Receive(ChatMessage msg);
