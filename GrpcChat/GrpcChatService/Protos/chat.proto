@@ -1,0 +1,34 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "GrpcChatService";
+
+package chat;
+
+// The chat service definition.
+service Chat {
+  // connects a client
+  rpc Connect (ConnectUserRequest) returns (ConnectUserResponse);
+  rpc SendMessageToChatService(stream ChatMessage) returns (stream ChatMessage);
+}
+
+// The request message containing the user's name.
+message ConnectUserRequest {
+  User user = 1;
+}
+
+// The response message containing is the user is connected.
+message ConnectUserResponse {
+  bool isUserConnected = 1;
+  string message = 2;
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+}
+
+message ChatMessage {
+  string userId = 1;
+  string userName = 2;
+  string message = 3;
+}
