@@ -29,12 +29,10 @@ namespace GrpcChatClient
                 Name = username,
             };
 
-            var channel = GrpcChannel.ForAddress($"https://{ip}:5001", new GrpcChannelOptions { Credentials = ChannelCredentials.SecureSsl }); // TODO 5000 port for http?
+            var channel = GrpcChannel.ForAddress($"https://{ip}:5001", new GrpcChannelOptions { Credentials = ChannelCredentials.SecureSsl });
             var client = new Chat.ChatClient(channel);
-            var connectUserReply = await client.ConnectAsync(new ConnectUserRequest
-            {
-                User = user,
-            });
+            var connectUserReply = await client.ConnectAsync(new ConnectUserRequest { User = user });
+            Console.WriteLine(connectUserReply.Message);
 
             using (var streaming = client.SendMessageToChatService(new Metadata { new Metadata.Entry("Username", user.Name) }))
             {
@@ -42,32 +40,30 @@ namespace GrpcChatClient
                 {
                     while (await streaming.ResponseStream.MoveNext())
                     {
-                        Console.WriteLine($"{streaming.ResponseStream.Current.UserName}: {streaming.ResponseStream.Current.Message}");
+                        Console.WriteLine($"{streaming.ResponseStream.Current.UserName} ({DateTime.Now}): {streaming.ResponseStream.Current.Message}");
                     }
                 });
 
-                await streaming.RequestStream.WriteAsync(new ChatMessage
+                var chatMessage = new ChatMessage
                 {
                     UserId = user.Id,
                     UserName = user.Name,
                     Message = "",
-                });
+                };
+                await streaming.RequestStream.WriteAsync(chatMessage);
                 Console.WriteLine($"Joined the chat as {user.Name}");
-
-                var line = Console.ReadLine();
-                while (!string.Equals(line, "exit", StringComparison.OrdinalIgnoreCase))
+                string line;
+                do
                 {
-                    await streaming.RequestStream.WriteAsync(new ChatMessage
-                    {
-                        UserId = user.Id,
-                        UserName = user.Name,
-                        Message = line,
-                    });
                     line = Console.ReadLine();
-                }
+                    chatMessage.Message = line;
+                    await streaming.RequestStream.WriteAsync(chatMessage);
+                } while (!string.Equals(line, "exit", StringComparison.OrdinalIgnoreCase));
+
                 await streaming.RequestStream.CompleteAsync();
             }
-            Console.WriteLine("Press any key to exit...");
+
+            Console.WriteLine("Press any key to exit the chat client.");
             Console.ReadKey();
         }
     }

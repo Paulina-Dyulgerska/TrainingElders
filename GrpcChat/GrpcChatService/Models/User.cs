@@ -8,6 +8,6 @@ namespace GrpcChatService.Models
 
         public string Name { get; set; }
 
-        public IAsyncStreamWriter<ChatMessage> Stream { get; set; }
+        public IAsyncStreamWriter<ChatMessage> responseStream { get; set; }
     }
 }

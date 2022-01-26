@@ -10,9 +10,9 @@ namespace GrpcChatService.Services
 {
     public class ChatService : Chat.ChatBase
     {
-        private readonly ILogger<ChatService> logger;
-
+        private static readonly object mutex = new object();
         private static readonly IList<Models.User> users = new List<Models.User>();
+        private readonly ILogger<ChatService> logger;
 
         public ChatService(ILogger<ChatService> logger)
         {
@@ -21,35 +21,29 @@ namespace GrpcChatService.Services
 
         public override async Task<ConnectUserResponse> Connect(ConnectUserRequest request, ServerCallContext context)
         {
-            var hasThisUser = users.Any(x => x.Id == request.User.Id);
+            var newUser = new Models.User
+            {
+                Id = request.User.Id,
+                Name = request.User.Name,
+            };
 
             var response = new ConnectUserResponse();
-            if (hasThisUser != true)
+
+            try
             {
-                var currentUser = new Models.User
+                await SendMessageToAllUsers(new ChatMessage { UserName = "Chat Service", Message = $"User {newUser.Name} joined the chat!" });
+                lock (mutex)
                 {
-                    Id = request.User.Id,
-                    Name = request.User.Name,
-                };
-
-                try
-                {
-                    await SendMessageToAllUsers(new ChatMessage { Message = $"User {currentUser.Name} joined the chat!", UserName = "ChatService" });
+                    users.Add(newUser);
                 }
-                catch
-                {
-                    users.Remove(currentUser);
-                    response.IsUserConnected = false;
-                    response.Message = $"Failed to connect {currentUser.Name}!";
-                }
-
-                users.Add(currentUser);
                 response.IsUserConnected = true;
-                response.Message = $"Hello, {currentUser.Name}!";
+                response.Message = $"User {newUser.Name} connected!";
             }
-            else
+            catch (Exception ex)
             {
-                response.Message = $"Already has such user {request.User.Name} ({request.User.Id})!";
+                users.Remove(newUser);
+                response.Message = $"Failed to connect {newUser.Name}!";
+                throw ex;
             }
 
             return response;
@@ -60,19 +54,15 @@ namespace GrpcChatService.Services
             var httpContext = context.GetHttpContext();
             logger.LogInformation($"Connection id: {httpContext.Connection.Id}");
 
-            if (!await requestStream.MoveNext())
-            {
+            if (await requestStream.MoveNext() == false)
                 return;
-            }
 
             var userId = requestStream.Current.UserId;
             var user = users.Where(x => x.Id == userId).FirstOrDefault();
+            if (user != null)
+                user.responseStream = responseStream;
 
-            if (user == null)
-            { } //TODO
-            user.Stream = responseStream;
-
-            logger.LogInformation($"{user} connected");
+            logger.LogInformation($"{user.Name} ({user.Id}) connected.");
 
             try
             {
@@ -82,6 +72,7 @@ namespace GrpcChatService.Services
                     {
                         if (string.Equals(requestStream.Current.Message, "exit", StringComparison.OrdinalIgnoreCase))
                         {
+                            DisconnectUser(requestStream.Current.UserId);
                             break;
                         }
                         await SendMessageToAllUsers(requestStream.Current);
@@ -97,18 +88,19 @@ namespace GrpcChatService.Services
 
         private async Task SendMessageToAllUsers(ChatMessage chatMessage)
         {
-
             foreach (var user in users)
             {
-                await user.Stream.WriteAsync(chatMessage);
-                logger.LogInformation($"Sent message from {chatMessage.UserName} to {user.Name}");
+                await user.responseStream.WriteAsync(chatMessage);
+                logger.LogInformation($"Sent message from {chatMessage.UserName} to {user.Name}.");
             }
         }
 
-        private void DisconnectUser(string userId)
+        private async void DisconnectUser(string userId)
         {
             var user = users.Where(x => x.Id == userId).FirstOrDefault();
             users.Remove(user);
+            logger.LogInformation($"{user.Name} ({user.Id}) disconnected.");
+            await SendMessageToAllUsers(new ChatMessage { UserName = "Chat Service", Message = $"User {user.Name} left the chat!" });
         }
     }
 }
