@@ -9,13 +9,10 @@ namespace WcfClient
         static void Main(string[] args)
         {
             //var chatClient = new ChatClient(new InstanceContext(new ChatClientCallBack()));
-            Console.WriteLine("Enter service IP: ");
+            Console.WriteLine("Enter service IP (default: localhost): ");
             var ip = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(ip))
-            {
-                Console.WriteLine("Service IP is required. Bye!");
-                return;
-            }
+                ip = "localhost";
 
             ChatClient chatClient = null;
             try
@@ -53,7 +50,7 @@ namespace WcfClient
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An exception occurred: {ex.Message}");
+                Console.WriteLine($"An exception occurred: {ex}");
             }
             finally
             {
