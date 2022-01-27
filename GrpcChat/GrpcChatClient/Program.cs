@@ -1,6 +1,5 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
-using GrpcClient;
 using System;
 using System.Threading.Tasks;
 

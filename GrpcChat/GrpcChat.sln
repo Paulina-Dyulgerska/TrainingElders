@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChatService", "GrpcChatService\GrpcChatService.csproj", "{A4276520-3592-409D-BDDF-699EDA748644}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcChatService", "GrpcChatService\GrpcChatService.csproj", "{A4276520-3592-409D-BDDF-699EDA748644}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChatClient", "GrpcChatClient\GrpcChatClient.csproj", "{0EF7BA21-C94D-43C5-9E35-D30EF94A0E1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcChatClient", "GrpcChatClient\GrpcChatClient.csproj", "{0EF7BA21-C94D-43C5-9E35-D30EF94A0E1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

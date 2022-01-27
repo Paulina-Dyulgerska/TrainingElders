@@ -7,7 +7,5 @@ namespace GrpcChatService.Models
         public string Id { get; set; }
 
         public string Name { get; set; }
-
-        public IAsyncStreamWriter<ChatMessage> responseStream { get; set; }
     }
 }
