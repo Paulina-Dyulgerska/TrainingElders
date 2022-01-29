@@ -35,38 +35,49 @@ namespace WebApiChatClient
             HttpContent clientHttpContent = new StringContent(JsonSerializer.Serialize(client));
 
             var clientService = new ClientService();
-            using (var chatServer = new HttpClient() { BaseAddress = new Uri("http://localhost:5000") })
+
+            try
             {
-                try
+                using (var chatServer = new HttpClient() { BaseAddress = new Uri("http://localhost:5000") })
                 {
-                    await clientService.PostToServerAsync(chatServer, "chat/connect", clientHttpContent);
-
-                    var line = clientService.ReadString();
-                    while (line != "exit")
+                    try
                     {
-                        var chatMessage = new ChatMessage()
-                        {
-                            UserName = username,
-                            Content = line,
-                            CreatedOn = DateTime.Now,
-                        };
-                        var messageHttpContent = new StringContent(JsonSerializer.Serialize(chatMessage));
-                        await clientService.PostToServerAsync(chatServer, "chat", messageHttpContent);
-                        line = clientService.ReadString();
-                    }
+                        await clientService.PostToServerAsync(chatServer, "chat/connect", clientHttpContent);
 
-                    //await host.WaitForShutdownAsync();
-                }
-                catch (Exception)
-                {
-                }
-                finally
-                {
-                    await clientService.PostToServerAsync(chatServer, "chat/disconnect", clientHttpContent);
+                        var line = clientService.ReadString();
+                        while (line != "exit")
+                        {
+                            var chatMessage = new ChatMessage()
+                            {
+                                UserName = username,
+                                Content = line,
+                                CreatedOn = DateTime.Now,
+                            };
+                            var messageHttpContent = new StringContent(JsonSerializer.Serialize(chatMessage));
+                            await clientService.PostToServerAsync(chatServer, "chat", messageHttpContent);
+                            line = clientService.ReadString();
+                        }
+
+                        //await host.WaitForShutdownAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                    finally
+                    {
+                        await clientService.PostToServerAsync(chatServer, "chat/disconnect", clientHttpContent);
+                    }
                 }
             }
-
-            await host.StopAsync();
+            catch (Exception)
+            {
+                Console.WriteLine("Error. Chat service is not available.");
+            }
+            finally
+            {
+                await host.StopAsync();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
