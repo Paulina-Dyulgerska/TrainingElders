@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SignalRChatModels;
+using System;
 using System.Threading.Tasks;
 
 namespace SignalRChatService.Hubs
@@ -30,6 +31,13 @@ namespace SignalRChatService.Hubs
         public async Task Send(ChatMessage.Dto message)
         {
             await chatRoomApplicationService.PublishMessage(message.ToModel());
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            var client = connectionStore.GetClient(Context.ConnectionId);
+            chatRoomApplicationService.Leave(client).GetAwaiter().GetResult();
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }

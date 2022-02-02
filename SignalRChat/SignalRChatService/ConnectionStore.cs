@@ -1,6 +1,7 @@
 ﻿using SignalRChatModels;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace SignalRChatService
 {
@@ -33,6 +34,11 @@ namespace SignalRChatService
                 return connections[client];
 
             throw new ArgumentException($"'{client.Username}' is not connected");
+        }
+
+        public Client GetClient(string connection)
+        {
+            return connections.Where(x => x.Value == connection).FirstOrDefault().Key;
         }
     }
 }

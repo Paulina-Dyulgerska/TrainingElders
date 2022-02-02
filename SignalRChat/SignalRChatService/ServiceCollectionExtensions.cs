@@ -8,8 +8,8 @@ namespace SignalRChatService
         public static IServiceCollection AddChatApp(this IServiceCollection services)
         {
             services.AddSingleton<ConnectionStore>();
-            services.AddTransient<IChatCommunicationChannel, SignalRCommunicationChannel>();
             services.AddSingleton<ChatRoom>();
+            services.AddTransient<IChatCommunicationChannel, SignalRCommunicationChannel>();
             services.AddTransient<ChatRoomApplicationService>();
 
             return services;
