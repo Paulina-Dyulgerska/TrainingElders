@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SignalRChatModels;
 using SignalRChatService.Hubs;
 
 namespace SignalRChatService
@@ -21,10 +19,8 @@ namespace SignalRChatService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<IChatCommunicationChannel, ChatRoomHub>();
-            services.AddSingleton<ChatRoom>();
+            services.AddChatApp();
             services.AddSignalR();
-            services.AddSingleton<IUserIdProvider, UserIdProvider>();
             services.AddControllers();
         }
 
@@ -47,14 +43,6 @@ namespace SignalRChatService
                 endpoints.MapHub<ChatRoomHub>("/chathub");
                 endpoints.MapControllers();
             });
-        }
-    }
-
-    public class UserIdProvider : IUserIdProvider
-    {
-        public string GetUserId(HubConnectionContext connection)
-        {
-            return connection.ConnectionId;
         }
     }
 }

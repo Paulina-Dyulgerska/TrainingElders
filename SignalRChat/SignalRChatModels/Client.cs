@@ -22,8 +22,7 @@ namespace SignalRChatModels
 
         public bool Equals(Client other)
         {
-            return other != null &&
-                   Username == other.Username;
+            return other != null && Username == other.Username;
         }
 
         public override int GetHashCode()

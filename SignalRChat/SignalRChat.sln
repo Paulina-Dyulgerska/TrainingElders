@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRChatService", "SignalRChatService\SignalRChatService.csproj", "{2CA9DEBB-5571-4E0A-919B-B71EF5141FB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRChatService", "SignalRChatService\SignalRChatService.csproj", "{2CA9DEBB-5571-4E0A-919B-B71EF5141FB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRChatClient", "SignalRChatClient\SignalRChatClient.csproj", "{819C9D8C-3277-4E3F-8DC4-CA69AA24FA99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRChatClient", "SignalRChatClient\SignalRChatClient.csproj", "{819C9D8C-3277-4E3F-8DC4-CA69AA24FA99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRChatModels", "SignalRChatModels\SignalRChatModels.csproj", "{CD60631F-11F3-4FB5-B22E-11EC571A77D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRChatModels", "SignalRChatModels\SignalRChatModels.csproj", "{CD60631F-11F3-4FB5-B22E-11EC571A77D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

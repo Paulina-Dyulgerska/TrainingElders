@@ -36,23 +36,27 @@ namespace SignalRChatClient
             try
             {
                 //connection.Closed += reconnect;
-                //connection.On<ChatMessage>(
-                //    "ReceiveMessage",
-                //    chatMessage => Console.WriteLine($"{chatMessage.Author} ({chatMessage.CreatedOn}): {chatMessage.Content}"));
+                connection.On<ChatMessage.Dto>(
+                    "ReceiveMessage",
+                    chatMessage => Console.WriteLine($"{chatMessage.Author} ({chatMessage.CreatedOn}): {chatMessage.Content}"));
 
                 await connection.StartAsync();
-
-                Console.WriteLine(connection.ConnectionId);
+                connection.ServerTimeout = TimeSpan.FromSeconds(3 * 60);
                 await connection.InvokeAsync("Join", new Client(username));
-                Console.WriteLine("Use \"exit\" to quit the chat.");
+
+                Console.WriteLine("Type \"exit\" to quit the chat.");
                 var line = Console.ReadLine();
                 while (line != "exit")
                 {
-                    await connection.InvokeAsync("Send", new ChatMessage(username, line));
+                    await connection.InvokeAsync("Send", ChatMessage.Dto.From(new ChatMessage(username, line, DateTimeOffset.UtcNow)));
                     line = Console.ReadLine();
                 }
 
                 await connection.InvokeAsync("Leave", new Client(username));
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             catch (Exception)
             {
