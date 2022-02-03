@@ -7,7 +7,7 @@ namespace SignalRChatService
 {
     public class SignalRCommunicationChannel : IChatCommunicationChannel
     {
-        private readonly IHubContext<ChatRoomHub> hubContext;
+        private readonly IHubContext<ChatRoomHub> hubContext; // injects the hub
         private readonly ConnectionStore connectionStore;
 
         public SignalRCommunicationChannel(IHubContext<ChatRoomHub> hubContext, ConnectionStore connectionStore)
