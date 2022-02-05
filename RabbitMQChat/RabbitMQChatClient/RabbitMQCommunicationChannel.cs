@@ -1,7 +1,6 @@
 ﻿using ChatModels;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 
@@ -9,31 +8,57 @@ namespace RabbitMQChatClient
 {
     public class RabbitMQCommunicationChannel : IChatCommunicationChannel
     {
-        private readonly IModel channel;
-        private readonly EventingBasicConsumer consumer;
-        private readonly IBasicProperties props;
-        private readonly ConcurrentQueue<ChatMessage> respQueue = new ConcurrentQueue<ChatMessage>();
-        private string queueName;
+        private const string newUserQueueName = "newUser";
         private const string messageToAllExchangeType = "messageExchange";
         private const string directMessageExchangeType = "direct";
+
+        private readonly IModel channel;
+        private IBasicProperties? props;
+        private string? queueName;
+
+        public event EventHandler<BasicDeliverEventArgs>? OnNewClientConnect;
+        public event EventHandler<BasicDeliverEventArgs>? OnNewMessageReceive;
+        public event EventHandler<ShutdownEventArgs>? OnModelShutdown;
 
         public RabbitMQCommunicationChannel(IConnection connection)
         {
             channel = connection.CreateModel();
-            queueName = channel.QueueDeclare().QueueName;
-            props = channel.CreateBasicProperties();
-            props.ReplyTo = queueName;
+        }
+
+        public string Build(string username)
+        {
             channel.ExchangeDeclare(exchange: messageToAllExchangeType, ExchangeType.Fanout);
             channel.ExchangeDeclare(exchange: directMessageExchangeType, ExchangeType.Direct);
+
+            queueName = channel.QueueDeclare().QueueName;
+            channel.QueueDeclare(queue: newUserQueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+            props = channel.CreateBasicProperties();
+            props.ReplyTo = queueName;
+            props.CorrelationId = username;
+
+            channel.QueueBind(queue: newUserQueueName,
+                              exchange: directMessageExchangeType,
+                              routingKey: newUserQueueName);
             channel.QueueBind(queue: queueName,
                               exchange: messageToAllExchangeType,
                               routingKey: string.Empty);
             channel.QueueBind(queue: queueName,
                               exchange: directMessageExchangeType,
                               routingKey: queueName); //could be other key string, like username if the last is unique
-            consumer = new EventingBasicConsumer(channel);
+
+            var consumer = new EventingBasicConsumer(channel);
             consumer.Received += OnMessageReceived;
             channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+            var archiveConsumer = new EventingBasicConsumer(channel);
+            archiveConsumer.Received += OnNewClientConnected;
+            channel.BasicConsume(queue: newUserQueueName, autoAck: false, consumer: archiveConsumer);
+
+            channel.ModelShutdown += OnModelShuteddown;
+
+            PublishMessage(newUserQueueName, directMessageExchangeType, new ChatMessage(queueName, $"I am here ({props.CorrelationId})")).GetAwaiter().GetResult();
+
+            return queueName;
         }
 
         public Task SendMessage(ChatMessage message)
@@ -43,7 +68,7 @@ namespace RabbitMQChatClient
 
         public Task SendMessage(Client receiver, ChatMessage message)
         {
-            return PublishMessage(props.ReplyTo, directMessageExchangeType, message);
+            return PublishMessage(receiver.ConnectionId, directMessageExchangeType, message);
         }
 
         private Task PublishMessage(string routingKey, string exchangeType, ChatMessage message)
@@ -63,14 +88,22 @@ namespace RabbitMQChatClient
 
         private void OnMessageReceived(object? sender, BasicDeliverEventArgs ea)
         {
-            var body = ea.Body.ToArray();
-            var serializedMessage = Encoding.UTF8.GetString(body);
-            var message = JsonSerializer.Deserialize<ChatMessage.Dto>(serializedMessage);
-            channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false); // Note: it is possible to access the channel via ((EventingBasicConsumer)sender).Model here
-            Console.WriteLine($"{message?.Author} ({message?.CreatedOn}): {message?.Content}");
-
-            if (message is not null)
-                respQueue.Enqueue(message.ToModel());
+            OnNewMessageReceive?.Invoke(sender, ea);
         }
+
+        private void OnNewClientConnected(object? sender, BasicDeliverEventArgs ea)
+        {
+            OnNewClientConnect?.Invoke(sender, ea);
+        }
+
+        private void OnModelShuteddown(object? sender, ShutdownEventArgs ea)
+        {
+            OnModelShutdown?.Invoke(sender, ea);
+        }
+
+        //public void Close()
+        //{
+        //    consumer.Received -= OnMessageReceived; // Do not do this, because the result is "RabbitMQ.Client.Exceptions.AlreadyClosedException"
+        //}
     }
 }

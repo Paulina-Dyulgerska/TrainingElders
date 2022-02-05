@@ -21,10 +21,7 @@ namespace ChatModels
             var messages = chatRoom.Join(client);
             await SendMessages(messages);
 
-            foreach (var msg in chatRoom.GetHistory().Where(x => x.IsForAll))
-            {
-                await chatCommunication.SendMessage(client, msg);
-            }
+            await SendHistory(client);
 
             chatRoom.AppentToHistory(messages);
         }
@@ -47,6 +44,14 @@ namespace ChatModels
             await chatCommunication.SendMessage(message);
 
             chatRoom.AppentToHistory(message);
+        }
+
+        public async Task SendHistory(Client client)
+        {
+            foreach (var msg in chatRoom.GetHistory().Where(x => x.IsForAll).OrderBy(x => x.CreatedOn))
+            {
+                await chatCommunication.SendMessage(client, msg);
+            }
         }
 
         private async Task SendMessages(IEnumerable<ChatMessage> messages)
