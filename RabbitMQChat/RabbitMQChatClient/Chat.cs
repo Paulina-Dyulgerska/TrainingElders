@@ -1,5 +1,4 @@
 ﻿using ChatModels;
-using RabbitMQ.Client.Events;
 
 namespace RabbitMQChatClient
 {
@@ -14,44 +13,15 @@ namespace RabbitMQChatClient
             this.chatRoomApplicationService = chatRoomApplicationService;
         }
 
-        //private void OnNewMessageReceived(object? sender, BasicDeliverEventArgs ea)
-        //{
-        //    // Note: it is possible to access the channel via ((EventingBasicConsumer)sender).Model here
-        //    if (sender != null)
-        //        ((EventingBasicConsumer)sender).Model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-
-        //    var message = MessageDeserializer.DeserializeMessage<ChatMessage.Dto>(sender, ea);
-        //    Console.WriteLine($"{message?.Author} ({message?.CreatedOn}): {message?.Content}");
-        //    if (message != null && ea.BasicProperties.ReplyTo != client.ConnectionId)
-        //        chatRoom.AppentToHistory(message.ToModel());
-        //}
-
         public async Task StartAsync(Client client)
         {
-            //EventHandler<BasicDeliverEventArgs> OnNewClientConnected = async (sender, ea) =>
-            //{
-            //    var message = MessageDeserializer.DeserializeMessage<ChatMessage.Dto>(sender, ea);
-            //    Console.WriteLine($"From archive queue => {message?.Author} ({message?.CreatedOn}): {message?.Content}")
-            //    ;
-            //    if (message != null && ea.BasicProperties.ReplyTo != client.ConnectionId)
-            //        await chatRoomApplicationService.SendHistory(new Client(message?.Author, ea.BasicProperties.ReplyTo));
-            //};
-
             try
             {
-                //((RabbitMQCommunicationChannel)channel).OnNewClientConnect += OnNewClientConnected;
-                //((RabbitMQCommunicationChannel)channel).OnNewMessageReceive += OnNewMessageReceived;
                 chatMessageReceiver.RegisterMessageReseivedHandler((c, cm) =>
                 {
                     Console.WriteLine($"{cm?.Author} ({cm?.CreatedOn}): {cm?.Content}");
                     return true;
                 });
-
-                //chatMessageReceiver.RegisterClientConnectedHandler(c =>
-                //{
-                //    Console.WriteLine($"{c.Username} joined");
-                //    return Task.CompletedTask;
-                //});
 
                 if (chatRoomApplicationService.UserIsJoined(client.Username))
                 {
@@ -71,9 +41,8 @@ namespace RabbitMQChatClient
                         var history = chatRoomApplicationService.GetHistory();
                         foreach (var cm in history)
                         {
-                            Console.WriteLine($"(history): {cm?.Author} ({cm?.CreatedOn}): {cm?.Content}");
+                            Console.WriteLine($"(history): {cm?.Author} ({cm?.CreatedOn}): {cm?.Content} {cm?.IsForAll} {cm?.Receiver?.Username}");
                         }
-
 
                         line = string.Empty;
                         continue;
@@ -93,11 +62,6 @@ namespace RabbitMQChatClient
             {
                 Console.WriteLine(ex.Message);
                 //Console.WriteLine("Chat service is not available.");
-            }
-            finally
-            {
-                //((RabbitMQCommunicationChannel)channel).OnNewClientConnect -= OnNewClientConnected;
-                //((RabbitMQCommunicationChannel)channel).OnNewMessageReceive -= OnNewMessageReceived;
             }
         }
     }

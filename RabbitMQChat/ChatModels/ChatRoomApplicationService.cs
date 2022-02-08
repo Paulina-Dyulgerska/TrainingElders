@@ -36,7 +36,7 @@ namespace ChatModels
 
             await SendHistory(client);
 
-            chatRoom.AppentToHistory(welcomeMessages);
+            //chatRoom.AppentToHistory(welcomeMessages); //not needed since the history log is done by the chatMessageReceiver.RegisterMessageReseivedHandler function above
         }
 
         public async Task Leave(Client client)

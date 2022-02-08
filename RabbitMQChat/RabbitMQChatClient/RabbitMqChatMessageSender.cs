@@ -31,6 +31,7 @@ namespace RabbitMQChatClient
             var props = channel.CreateBasicProperties();
             props.ReplyTo = routingKey;
 
+            //var body = serializer.Serialize(message); //this works too
             var body = serializer.Serialize(ChatMessage.Dto.From(message));
             channel.BasicPublish(exchange: exchangeType,
                            routingKey: routingKey,

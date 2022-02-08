@@ -19,6 +19,14 @@ namespace ChatModels
 
         public ChatMessage(string author, string content, DateTimeOffset createdOn) : this(Guid.NewGuid().ToString(), author, content, createdOn) { }
 
+        //public ChatMessage(string author, string content, DateTimeOffset createdOn, string receiverName) : this(Guid.NewGuid().ToString(), author, content, createdOn)
+        //{
+        //    if (receiverName != null)
+        //    {
+        //        Receiver = new Client(receiverName);
+        //    }
+        //}
+
         public bool IsForAll => Receiver is null;
 
         public string Id { get; private set; }
@@ -53,6 +61,8 @@ namespace ChatModels
                     Author = chatMessage.Author,
                     Content = chatMessage.Content,
                     CreatedOn = chatMessage.CreatedOn,
+                    IsForAll = chatMessage.IsForAll,
+                    ReceiverName = chatMessage.Receiver?.Username,
                 };
 
                 return chatMessageDto;
@@ -60,7 +70,12 @@ namespace ChatModels
 
             public ChatMessage ToModel()
             {
-                return new ChatMessage(Id, Author, Content, CreatedOn);
+                var model = new ChatMessage(Author, Content, CreatedOn);
+                if (string.IsNullOrWhiteSpace(ReceiverName) == false)
+                {
+                    model.To(new Client(ReceiverName));
+                }
+                return model;
             }
 
             public string Id { get; set; }
@@ -70,6 +85,10 @@ namespace ChatModels
             public string Content { get; set; }
 
             public DateTimeOffset CreatedOn { get; set; }
+
+            public bool IsForAll { get; set; }
+
+            public string ReceiverName { get; set; }
         }
     }
 }

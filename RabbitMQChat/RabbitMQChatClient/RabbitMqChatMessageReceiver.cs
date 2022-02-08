@@ -10,7 +10,7 @@ namespace RabbitMQChatClient
         private readonly List<Func<Client, Task>> clientConnectedHandlers = new List<Func<Client, Task>>();
         private readonly RabbitMqModelFactory modelFactory;
         private readonly ISerializer serializer;
-        private Client client;
+        private Client? client;
 
         public RabbitMqChatMessageReceiver(RabbitMqModelFactory modelFactory, ISerializer serializer)
         {
@@ -50,6 +50,7 @@ namespace RabbitMQChatClient
         {
             messageReceivedHandlers.Add(func);
         }
+
         public void RegisterClientConnectedHandler(Func<Client, Task> func)
         {
             clientConnectedHandlers.Add(func);
@@ -70,12 +71,6 @@ namespace RabbitMQChatClient
             var message = serializer.Deserialize<ChatMessage.Dto>(ea.Body.ToArray());
             if (message == null)
                 return;
-
-            //if (message.Author == client.Username)
-            //{
-            //    consumer.Model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-            //    return;
-            //}
 
             var model = message.ToModel();
             foreach (var handler in messageReceivedHandlers)
