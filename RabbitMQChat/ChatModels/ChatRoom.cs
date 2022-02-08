@@ -14,7 +14,8 @@ namespace ChatModels
         {
             if (client is null) throw new ArgumentNullException(nameof(client));
 
-            //if (clients.Contains(client))
+            if (clients.Contains(client))
+                return Enumerable.Empty<ChatMessage>();
             //    throw new ArgumentException($"There is already an user with username '{client.Username}'");
 
             clients.Add(client);
@@ -66,6 +67,11 @@ namespace ChatModels
         public bool HasClient(Client client)
         {
             return this.clients.Contains(client);
+        }
+
+        public bool HasClient(string username)
+        {
+            return clients.Any(x => x.Username == username);
         }
     }
 }

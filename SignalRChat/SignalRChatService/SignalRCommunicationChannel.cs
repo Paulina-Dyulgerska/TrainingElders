@@ -16,9 +16,9 @@ namespace SignalRChatService
             this.connectionStore = connectionStore;
         }
 
-        public async Task SendMessage(ChatMessage message)
+        public Task SendMessage(ChatMessage message)
         {
-            await hubContext.Clients.All.SendAsync("ReceiveMessage", ChatMessage.Dto.From(message));
+            return hubContext.Clients.All.SendAsync("ReceiveMessage", ChatMessage.Dto.From(message));
         }
 
         public async Task SendMessage(Client receiver, ChatMessage message)

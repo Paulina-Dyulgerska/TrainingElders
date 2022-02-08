@@ -7,23 +7,36 @@ namespace ChatModels
 {
     public class ChatRoomApplicationService
     {
-        private readonly IChatCommunicationChannel chatCommunication;
+        private readonly IChatMessageSender chatMessageSender;
         private readonly ChatRoom chatRoom;
 
-        public ChatRoomApplicationService(IChatCommunicationChannel chatCommunication, ChatRoom chatRoom)
+        public ChatRoomApplicationService(IChatMessageSender chatMessageSender, IChatMessageReceiver chatMessageReceiver, ChatRoom chatRoom)
         {
-            this.chatCommunication = chatCommunication;
+            this.chatMessageSender = chatMessageSender;
             this.chatRoom = chatRoom;
+            chatMessageReceiver.RegisterMessageReseivedHandler((c, msg) =>
+            {
+                if (msg.Author == c.Username)
+                    return true;
+
+                chatRoom.AppentToHistory(msg);
+                return true;
+            });
+
+            chatMessageReceiver.RegisterClientConnectedHandler(async client =>
+            {
+                await SendHistory(client);
+            });
         }
 
         public async Task Join(Client client)
         {
-            var messages = chatRoom.Join(client);
-            await SendMessages(messages);
+            var welcomeMessages = chatRoom.Join(client);
+            await SendMessages(welcomeMessages);
 
             await SendHistory(client);
 
-            chatRoom.AppentToHistory(messages);
+            chatRoom.AppentToHistory(welcomeMessages);
         }
 
         public async Task Leave(Client client)
@@ -41,7 +54,7 @@ namespace ChatModels
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 
-            await chatCommunication.SendMessage(message);
+            await chatMessageSender.SendMessageAsync(message);
 
             chatRoom.AppentToHistory(message);
         }
@@ -50,18 +63,22 @@ namespace ChatModels
         {
             foreach (var msg in chatRoom.GetHistory().Where(x => x.IsForAll).OrderBy(x => x.CreatedOn))
             {
-                await chatCommunication.SendMessage(client, msg);
+                await chatMessageSender.SendMessageAsync(client, msg);
             }
         }
+
+        public IEnumerable<ChatMessage> GetHistory() => chatRoom.GetHistory();
+
+        public bool UserIsJoined(string username) => chatRoom.HasClient(username);
 
         private async Task SendMessages(IEnumerable<ChatMessage> messages)
         {
             foreach (var msg in messages)
             {
                 if (msg.IsForAll)
-                    await chatCommunication.SendMessage(msg);
+                    await chatMessageSender.SendMessageAsync(msg);
                 else
-                    await chatCommunication.SendMessage(msg.Receiver, msg);
+                    await chatMessageSender.SendMessageAsync(msg.Receiver, msg);
             }
         }
     }

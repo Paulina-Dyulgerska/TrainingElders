@@ -4,8 +4,8 @@ namespace SignalRChatModels
 {
     public interface IChatCommunicationChannel
     {
-        Task SendMessage(ChatMessage message);
+        Task SendMessage(ChatMessage message); // TODO: rename to async
 
-        Task SendMessage(Client receiver, ChatMessage message);
+        Task SendMessage(Client receiver, ChatMessage message); // TODO: rename
     }
 }
