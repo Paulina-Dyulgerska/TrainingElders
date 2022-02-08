@@ -98,7 +98,7 @@ namespace RabbitMQChatClient
             foreach (var item in clientConnectedHandlers)
             {
                 item(new Client(message.Author)).ConfigureAwait(false).GetAwaiter().GetResult();
-                Console.WriteLine($"{client.Username} sending history");
+                Console.WriteLine($"{client?.Username} sending history");
             }
 
             consumer.Model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);

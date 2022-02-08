@@ -14,12 +14,13 @@ namespace RabbitMQChatClient
         public IModel Build(string username)
         {
             var channel = connection.CreateModel();
+
             channel.ExchangeDeclare(exchange: Constants.MessageToAllExchangeType, ExchangeType.Fanout);
             channel.ExchangeDeclare(exchange: Constants.DirectMessageExchangeType, ExchangeType.Direct);
 
-            var queueName = channel.QueueDeclare(username, false, false, true, null).QueueName;
-            channel.QueueDeclare(queue: Constants.NewUserQueueName, durable: false, exclusive: false, autoDelete: false, arguments: new Dictionary<string, object> { { "name", username } });
-
+            var queueName = username;
+            channel.QueueDeclare(queue: queueName, durable: false, exclusive: true, autoDelete: true, arguments: null);
+            channel.QueueDeclare(queue: Constants.NewUserQueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
             channel.QueueBind(queue: Constants.NewUserQueueName,
                               exchange: Constants.DirectMessageExchangeType,

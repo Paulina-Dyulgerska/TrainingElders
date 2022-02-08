@@ -36,17 +36,17 @@ namespace RabbitMQChatClient
                 var line = Console.ReadLine();
                 while (line != "exit")
                 {
-                    if (line == "hh")
-                    {
-                        var history = chatRoomApplicationService.GetHistory();
-                        foreach (var cm in history)
-                        {
-                            Console.WriteLine($"(history): {cm?.Author} ({cm?.CreatedOn}): {cm?.Content} {cm?.IsForAll} {cm?.Receiver?.Username}");
-                        }
-
-                        line = string.Empty;
-                        continue;
-                    }
+                    //// For histroty debug:
+                    //if (line == "hh")
+                    //{
+                    //    var history = chatRoomApplicationService.GetHistory();
+                    //    foreach (var cm in history)
+                    //    {
+                    //        Console.WriteLine($"(history): {cm?.Author} ({cm?.CreatedOn}): {cm?.Content} {cm?.IsForAll} {cm?.Receiver?.Username}");
+                    //    }
+                    //    line = string.Empty;
+                    //    continue;
+                    //}
 
                     if (string.IsNullOrWhiteSpace(line) == false)
                     {
@@ -58,10 +58,9 @@ namespace RabbitMQChatClient
 
                 await chatRoomApplicationService.Leave(client);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                //Console.WriteLine("Chat service is not available.");
+                throw;
             }
         }
     }
