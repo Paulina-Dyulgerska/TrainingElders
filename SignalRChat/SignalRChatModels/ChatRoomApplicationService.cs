@@ -16,47 +16,47 @@ namespace SignalRChatModels
             this.chatRoom = chatRoom;
         }
 
-        public async Task Join(Client client)
+        public async Task JoinAsync(Client client)
         {
             var messages = chatRoom.Join(client);
-            await SendMessages(messages);
+            await SendMessagesAsync(messages);
 
             foreach (var msg in chatRoom.GetHistory().Where(x => x.IsForAll))
             {
-                await chatCommunication.SendMessage(client, msg);
+                await chatCommunication.SendMessageAsync(client, msg);
             }
 
             chatRoom.AppentToHistory(messages);
         }
 
-        public async Task Leave(Client client)
+        public async Task LeaveAsync(Client client)
         {
             if (client is null) throw new ArgumentNullException(nameof(client));
 
             var messages = chatRoom.Leave(client);
 
-            await SendMessages(messages);
+            await SendMessagesAsync(messages);
 
             chatRoom.AppentToHistory(messages);
         }
 
-        public async Task PublishMessage(ChatMessage message)
+        public async Task PublishMessageAsync(ChatMessage message)
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 
-            await chatCommunication.SendMessage(message);
+            await chatCommunication.SendMessageAsync(message);
 
             chatRoom.AppentToHistory(message);
         }
 
-        private async Task SendMessages(IEnumerable<ChatMessage> messages)
+        private async Task SendMessagesAsync(IEnumerable<ChatMessage> messages)
         {
             foreach (var msg in messages)
             {
                 if (msg.IsForAll)
-                    await chatCommunication.SendMessage(msg);
+                    await chatCommunication.SendMessageAsync(msg);
                 else
-                    await chatCommunication.SendMessage(msg.Receiver, msg);
+                    await chatCommunication.SendMessageAsync(msg.Receiver, msg);
             }
         }
     }

@@ -42,17 +42,17 @@ namespace SignalRChatClient
 
                 await connection.StartAsync();
                 connection.ServerTimeout = TimeSpan.FromSeconds(3 * 60);
-                await connection.InvokeAsync("Join", new Client(username));
+                await connection.InvokeAsync("JoinAsync", new Client(username));
 
                 Console.WriteLine("Type \"exit\" to quit the chat.");
                 var line = Console.ReadLine();
                 while (line != "exit")
                 {
-                    await connection.InvokeAsync("Send", ChatMessage.Dto.From(new ChatMessage(username, line, DateTimeOffset.UtcNow)));
+                    await connection.InvokeAsync("SendAsync", ChatMessage.Dto.From(new ChatMessage(username, line, DateTimeOffset.UtcNow)));
                     line = Console.ReadLine();
                 }
 
-                await connection.InvokeAsync("Leave", new Client(username));
+                await connection.InvokeAsync("LeaveAsync", new Client(username));
             }
             catch (ArgumentException ex)
             {

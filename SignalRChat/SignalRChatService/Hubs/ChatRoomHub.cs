@@ -16,27 +16,27 @@ namespace SignalRChatService.Hubs
             this.connectionStore = connectionStore;
         }
 
-        public async Task Join(Client client)
+        public async Task JoinAsync(Client client)
         {
             connectionStore.Add(client, Context.ConnectionId);
-            await chatRoomApplicationService.Join(client);
+            await chatRoomApplicationService.JoinAsync(client);
         }
 
-        public async Task Leave(Client client)
+        public async Task LeaveAsync(Client client)
         {
-            await chatRoomApplicationService.Leave(client);
+            await chatRoomApplicationService.LeaveAsync(client);
             connectionStore.Remove(client);
         }
 
-        public async Task Send(ChatMessage.Dto message)
+        public async Task SendAsync(ChatMessage.Dto message)
         {
-            await chatRoomApplicationService.PublishMessage(message.ToModel());
+            await chatRoomApplicationService.PublishMessageAsync(message.ToModel());
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var client = connectionStore.GetClient(Context.ConnectionId);
-            chatRoomApplicationService.Leave(client).GetAwaiter().GetResult();
+            chatRoomApplicationService.LeaveAsync(client).GetAwaiter().GetResult();
             return base.OnDisconnectedAsync(exception);
         }
     }
